@@ -1,0 +1,112 @@
+##### vi /latihan/roles/mariadb/tasks/main.yml #####
+---
+- name: install additional dbservers package
+  yum: name={{item}} state=latest
+  with_items:
+  - mariadb-server
+  - MySQL-python
+  - firewalld
+
+- name: create mariadb configuration file
+  template: src=my.cnf.j2 dest=/etc/my.cnf
+  notify: restart mariadb
+
+- name: create mariadb log file
+  file: path=/var/log/mariadb/mariadb.log state=touch owner=mysql group=mysql
+
+- name: create mariadb PID directory
+  file: path=/var/run/mariadb/  state=directory owner=mysql group=mysql
+
+- name: start mariadb service
+  service: name=mariadb state=started enabled=yes
+
+- name: start firewalld service
+  service: name=firewalld  enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{mysql_port}}/tcp permanent=true state=enabled 
+
+- name: headless mariadb root password file
+  tamplate: src=my.cnf.j1 dest=~/.my.cnf
+
+- name: copy mariadb root password file
+  template: src=.my.cnf.j2 dest=~/.my.cnf
+
+- name: set db root password
+  mysql_user: name=root password={{dbrootpasswordnew}}
+
+- name: delete test database
+  mysql_db: name={{item}} state=absent
+  with_items:
+  - test
+  - test\_%
+
+- name: create application database
+  mysql_db: name={{dbname}} state=present
+
+- name: create application database user
+  mysql_user: name={{dbuser}} password={{dbpassword}} priv='*.*:ALL'
+
+
+##### vi /latihan/roles/mariadb/templates/my.cnf.j2 #####
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+
+user=mysql
+symbolic-links=0
+port={{mysql_port}}
+
+[mysqld_safe]
+log-error=/var/log/mariadb/mariadb.log
+pid-file=/var/run/mariadb/mariadb.pid
+
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
+
+
+##### vi /latihan/roles/mariadb/handlers/main.yml #####
+---
+- name: restart mariadb
+  service: name=mariadb state=restarted
+
+
+##### vi /latihan/group_vars/dbservers #####
+mysql_port: 3306
+dbrootpasswordnew: RAHASIA
+dbname: dsc_ansible
+dbuser: danu
+dbpassword: secret
+
+
+##### vi /latihan/roles/mariadb/templates/.my.cnf.j1 #####
+[client]
+user=root
+password=
+
+
+[mysql]
+user=root
+password=
+
+##### vi /latihan/roles/mariadb/templates/.my.cnf.j2 #####
+[client]
+user=root
+password={{dbrootpasswordnew}}
+
+[mysql]
+user=root
+password={{dbrootpasswordnew}}
+
+
+##### vi /latihan/site.yml #####
+---
+.........
+- name: apply the database configuration
+  hosts: dbservers
+
+  roles:
+  - mariadb
+
+
