@@ -23,7 +23,7 @@
   service: name=firewalld  enabled=yes
 
 - name: insert firewalld rule
-  firewalld: port={{mysql_port}}/tcp permanent=true state=enabled 
+  firewalld: port=3306/tcp permanent=true state=enabled 
 
 - name: copy mariadb root password file
   template: src=.my.cnf.j2 dest=~/.my.cnf
