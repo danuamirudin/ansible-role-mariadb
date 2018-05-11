@@ -1,0 +1,6 @@
+- name: apply the database configuration
+  hosts: dbservers
+
+  roles:
+  - mariadb
+
