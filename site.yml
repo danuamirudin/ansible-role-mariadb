@@ -1,5 +1,5 @@
 - name: apply the database configuration
-  hosts: controller
+  hosts: dbservers
 
   roles:
   - mariadb
