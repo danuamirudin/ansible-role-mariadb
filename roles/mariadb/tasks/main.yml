@@ -1,4 +1,3 @@
----
 - name: install additional dbservers package
   yum: name={{item}} state=latest
   with_items:
@@ -23,7 +22,7 @@
   service: name=firewalld  enabled=yes
 
 - name: insert firewalld rule
-  firewalld: port=3306/tcp permanent=true state=enabled 
+  firewalld: port={{mysql_port}}/tcp permanent=true state=enabled 
 
 - name: copy mariadb root password file
   template: src=.my.cnf.j2 dest=~/.my.cnf
@@ -42,5 +41,3 @@
 
 - name: create application database user
   mysql_user: name={{dbuser}} password={{dbpassword}} priv='*.*:ALL'
-
-# tasks file for mariadb
