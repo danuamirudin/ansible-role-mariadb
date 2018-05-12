@@ -1,0 +1,6 @@
+- name: apply the database configuration
+  hosts: 10.80.80.20
+
+  roles:
+  - mariadb
+

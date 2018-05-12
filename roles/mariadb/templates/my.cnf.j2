@@ -1,0 +1,16 @@
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+
+user=mysql
+symbolic-links=0
+port=3306
+
+[mysqld_safe]
+log-error=/var/log/mariadb/mariadb.log
+pid-file=/var/run/mariadb/mariadb.pid
+
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
+
