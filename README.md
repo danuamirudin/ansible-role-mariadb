@@ -1,7 +1,7 @@
   # Ansible on OpenStack                     
                                         	  
 
-Assalmualaikum, 
+Assalamualaikum, 
 Hello everyone 
 
 
